@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Play, Users, Settings, HelpCircle, Newspaper, Gamepad2 } from "lucide-react";
+import { Play, Users, HelpCircle, Newspaper, Gamepad2 } from "lucide-react";
 
 const AVATARS = [
   "🧑‍🎨", "👩‍🎨", "🧑‍💼", "👩‍💼", "🧑‍🎓", "👩‍🎓", "🧑‍🔬", "👩‍🔬"

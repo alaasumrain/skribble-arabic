@@ -9,7 +9,6 @@ import {
   Globe, 
   Lock, 
   Play,
-  Settings,
   ArrowRight,
   Search,
   Palette

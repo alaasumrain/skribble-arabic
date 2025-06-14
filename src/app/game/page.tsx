@@ -38,7 +38,7 @@ export default function GamePage() {
   const [brushSize, setBrushSize] = useState(5);
   const [currentWord, setCurrentWord] = useState("قطة");
   const [timeLeft, setTimeLeft] = useState(57);
-  const [isPlayerDrawing, setIsPlayerDrawing] = useState(true);
+  const [isPlayerDrawing] = useState(true);
   const [isErasing, setIsErasing] = useState(false);
   const [undoStack, setUndoStack] = useState<string[]>([]);
   const [chatMessage, setChatMessage] = useState("");

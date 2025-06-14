@@ -8,7 +8,11 @@ const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
     origin: process.env.NODE_ENV === 'production' 
-      ? ["https://your-frontend-domain.vercel.app", "https://skribble-arabic.vercel.app"]
+      ? [
+          "https://skribble-arabic.vercel.app",
+          "https://skribble-arabic-alaasumrain.vercel.app",
+          "https://skribble-arabic-git-main-alaasumrain.vercel.app"
+        ]
       : ["http://localhost:3000", "http://localhost:3001"],
     methods: ["GET", "POST"]
   }

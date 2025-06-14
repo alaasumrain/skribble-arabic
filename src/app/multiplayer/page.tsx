@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { io, Socket } from "socket.io-client";
 import { 
   Palette, 
@@ -34,6 +34,14 @@ interface ChatMessage {
   isCorrect: boolean;
 }
 
+interface DrawingData {
+  type: string;
+  x?: number;
+  y?: number;
+  color?: string;
+  size?: number;
+}
+
 interface GameState {
   id: string;
   players: Player[];
@@ -44,7 +52,7 @@ interface GameState {
   maxRounds: number;
   gameStarted: boolean;
   gameEnded: boolean;
-  drawingData: any[];
+  drawingData: DrawingData[];
   chatHistory: ChatMessage[];
 }
 
@@ -271,17 +279,17 @@ export default function MultiplayerGamePage() {
     socket.emit("drawing-data", { type: "stop" });
   };
 
-  const handleRemoteDrawing = (data: any) => {
+  const handleRemoteDrawing = (data: DrawingData) => {
     const context = contextRef.current;
     if (!context) return;
 
-    context.strokeStyle = data.color;
-    context.lineWidth = data.size;
+    if (data.color) context.strokeStyle = data.color;
+    if (data.size) context.lineWidth = data.size;
 
-    if (data.type === "start") {
+    if (data.type === "start" && data.x !== undefined && data.y !== undefined) {
       context.beginPath();
       context.moveTo(data.x, data.y);
-    } else if (data.type === "draw") {
+    } else if (data.type === "draw" && data.x !== undefined && data.y !== undefined) {
       context.lineTo(data.x, data.y);
       context.stroke();
     }
