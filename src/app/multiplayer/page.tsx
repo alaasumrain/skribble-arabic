@@ -81,6 +81,35 @@ export default function MultiplayerGamePage() {
   const [selectedColor, setSelectedColor] = useState("#000000");
   const [brushSize, setBrushSize] = useState(5);
   const [isErasing, setIsErasing] = useState(false);
+  
+  const clearCanvas = useCallback(() => {
+    const canvas = canvasRef.current;
+    const context = contextRef.current;
+    if (!canvas || !context) return;
+
+    context.fillStyle = "white";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    
+    if (socket && gameState?.currentDrawer === socket.id) {
+      socket.emit("clear-canvas");
+    }
+  }, [socket, gameState]);
+
+  const handleRemoteDrawing = useCallback((data: DrawingData) => {
+    const context = contextRef.current;
+    if (!context) return;
+
+    if (data.color) context.strokeStyle = data.color;
+    if (data.size) context.lineWidth = data.size;
+
+    if (data.type === "start" && data.x !== undefined && data.y !== undefined) {
+      context.beginPath();
+      context.moveTo(data.x, data.y);
+    } else if (data.type === "draw" && data.x !== undefined && data.y !== undefined) {
+      context.lineTo(data.x, data.y);
+      context.stroke();
+    }
+  }, []);
 
   // Initialize socket connection
   useEffect(() => {
@@ -149,7 +178,7 @@ export default function MultiplayerGamePage() {
     return () => {
       newSocket.disconnect();
     };
-  }, []);
+  }, [clearCanvas, handleRemoteDrawing]);
 
   // Initialize canvas
   useEffect(() => {
@@ -170,7 +199,7 @@ export default function MultiplayerGamePage() {
     // Fill with white background
     context.fillStyle = "white";
     context.fillRect(0, 0, canvas.width, canvas.height);
-  }, []);
+  }, [brushSize, selectedColor]);
 
   // Update brush settings
   useEffect(() => {
@@ -200,9 +229,11 @@ export default function MultiplayerGamePage() {
   };
 
   const copyRoomId = () => {
-    navigator.clipboard.writeText(roomId);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(roomId);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   const getCoordinates = (event: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
@@ -277,35 +308,6 @@ export default function MultiplayerGamePage() {
     setIsDrawing(false);
     
     socket.emit("drawing-data", { type: "stop" });
-  };
-
-  const handleRemoteDrawing = (data: DrawingData) => {
-    const context = contextRef.current;
-    if (!context) return;
-
-    if (data.color) context.strokeStyle = data.color;
-    if (data.size) context.lineWidth = data.size;
-
-    if (data.type === "start" && data.x !== undefined && data.y !== undefined) {
-      context.beginPath();
-      context.moveTo(data.x, data.y);
-    } else if (data.type === "draw" && data.x !== undefined && data.y !== undefined) {
-      context.lineTo(data.x, data.y);
-      context.stroke();
-    }
-  };
-
-  const clearCanvas = () => {
-    const canvas = canvasRef.current;
-    const context = contextRef.current;
-    if (!canvas || !context) return;
-
-    context.fillStyle = "white";
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    
-    if (socket && gameState?.currentDrawer === socket.id) {
-      socket.emit("clear-canvas");
-    }
   };
 
   const sendMessage = () => {

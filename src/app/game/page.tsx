@@ -76,7 +76,7 @@ export default function GamePage() {
       };
       img.src = savedDrawing;
     }
-  }, []);
+  }, [brushSize, selectedColor]);
 
   // Update brush settings
   useEffect(() => {
